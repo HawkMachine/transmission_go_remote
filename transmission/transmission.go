@@ -1,4 +1,4 @@
-package remote
+package transmission
 
 import (
 	"fmt"
@@ -98,14 +98,12 @@ func (r *Remote) List(torrent string) ([]*Torrent, error) {
 
 		re = regexp.MustCompile(`(?m)Percent Done: (\d+)(\.\d+)?%$`)
 		items = re.FindStringSubmatch(section)
-		if len(items) == 0 {
-			return nil, fmt.Errorf("Failed to match Percent Done")
+		if len(items) > 0 {
+			pDone, err := strconv.Atoi(items[1])
+			if err == nil {
+				t.PercentDone = pDone
+			}
 		}
-		pDone, err := strconv.Atoi(items[1])
-		if err != nil {
-			return nil, fmt.Errorf("Failed to parse percent done: %v", err)
-		}
-		t.PercentDone = pDone
 
 		re = regexp.MustCompile(`(?m)ETA:.*\((\d+) seconds\)`)
 		items = re.FindStringSubmatch(section)
